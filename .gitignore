@@ -1,0 +1,92 @@
+# === Python / Virtualenv ===
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.pyc
+*$py.class
+*.so
+*.egg-info/
+.eggs/
+dist/
+build/
+develop-eggs/
+.installed.cfg
+*.egg
+.Python
+.venv/
+venv/
+ENV/
+env/
+pip-wheel-metadata/
+
+# === IDE / Editor ===
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# === OS / Misc ===
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# === Logs & Debug ===
+*.log
+*.tmp
+*.bak
+*.old
+logs/
+tmp/
+debug/
+.coverage
+coverage.xml
+.cache/
+pytest_cache/
+.mypy_cache/
+ruff_cache/
+
+# === Environment / Secrets ===
+.env
+.env.*
+!.env.example
+
+# === LangChain / Chroma ===
+.chroma/
+chromadb/
+chroma_index/
+.vectorstore/
+langchain.db
+*.sqlite3
+
+# === Reports / Docs ===
+htmlcov/
+site/
+docs/_build/
+*.pdf
+
+# === Containers / Docker ===
+*.pid
+*.sock
+.dockerignore
+docker-compose.override.yml
+
+# === Local Dev Artifacts ===
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.bak
+*.tmp
+*.log
+*.orig
+
+# === Jupyter / IPython ===
+.ipynb_checkpoints/
+*.ipynb
+*.nbconvert.ipynb

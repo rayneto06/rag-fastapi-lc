@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rag-fastapi-lc"
+version = "0.1.0"
+description = "RAG FastAPI (LangChain + LangSmith) — Steps 1–3"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.3.0",
+    "langchain>=0.3.0",
+    "langchain-community>=0.3.0",
+    "langchain-text-splitters>=0.3.0",
+    "langsmith>=0.1.104",
+    "langchain-chroma>=0.1.0",
+    "httpx>=0.28.0",
+    "python-dotenv>=1.0.1",
+    "pymupdf>=1.24.0",
+    "python-multipart>=0.0.9"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-asyncio>=0.23.8",
+    "ruff>=0.5.0",
+    "black>=24.4.2",
+    "mypy>=1.10.0",
+    "types-requests",
+]
+
+[tool.setuptools]
+packages = [
+    "app",
+    "domain",
+    "use_cases",
+    "infrastructure",
+    "interface_adapters",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-select = ["B", "C4", "I", "UP", "SIM"]
+fix = true
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = [
+  "ignore:.*SwigPyPacked.*__module__ attribute:DeprecationWarning",
+  "ignore:.*SwigPyObject.*__module__ attribute:DeprecationWarning",
+  "ignore:.*swigvarlink.*__module__ attribute:DeprecationWarning",
+]
