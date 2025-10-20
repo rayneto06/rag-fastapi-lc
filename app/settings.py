@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     retriever_search_type: str = "mmr"
     retriever_k: int = 5
 
+    # LLM Provider (Step 4)
+    llm_provider: str = "fake"       # fake | openai | ollama
+    llm_model: str = "fake"          # e.g., gpt-4o-mini | llama3.1
+    llm_temperature: float = 0.0     # determinístico por padrão
+
     model_config = SettingsConfigDict(env_file=".env", env_prefix="", extra="ignore")
 
 class AppState(BaseModel):

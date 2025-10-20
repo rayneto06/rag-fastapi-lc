@@ -1,5 +1,5 @@
-from typing import Protocol
+from typing import Protocol, List, Tuple
 
 class LLMProvider(Protocol):
-    def generate(self, prompt: str, max_tokens: int | None = None) -> str:  # pragma: no cover
+    def generate(self, question: str, context_snippets: List[Tuple[str, dict]] | None = None) -> str:  # pragma: no cover
         ...

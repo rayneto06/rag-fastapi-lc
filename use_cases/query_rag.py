@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import TypedDict, List, Dict, Any
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough, RunnableLambda
+from typing import TypedDict, List, Dict, Any, Tuple
 from infrastructure.vectorstores.chroma_store import ChromaVectorStore
+from infrastructure.llm.langchain_llm_provider import LangChainLLMProvider
 from app.settings import Settings
 
 class RAGHit(TypedDict):
@@ -19,24 +19,34 @@ class QueryRAGUseCase:
             persist_dir=self.settings.chroma_dir,
             collection_name=self.settings.chroma_collection,
         )
+        self.llm = LangChainLLMProvider(self.settings)
 
-    def _build_generate_chain(self, retriever):
-        def _format_answer(inputs: Dict[str, Any]) -> str:
-            question = inputs.get("question", "")
-            docs = inputs.get("context", [])
-            joined = "\n\n".join([d.page_content[:500] for d in docs[:3]])
-            return f"Q: {question}\n\nA (based on retrieved context):\n{joined}"
-        return RunnableParallel(context=retriever, question=RunnablePassthrough()) | RunnableLambda(_format_answer)
-
-    def execute(self, question: str, *, generate: bool = False, k: int | None = None, search_type: str | None = None) -> RAGResult:
+    def _retrieve(self, question: str) -> List[Any]:
         retriever = self.store.as_retriever(
-            search_type=search_type or self.settings.retriever_search_type,
-            k=k or self.settings.retriever_k,
+            search_type=self.settings.retriever_search_type,
+            k=self.settings.retriever_k,
         )
         docs = retriever.invoke(question)
-        hits: List[RAGHit] = [{"content": d.page_content, "metadata": d.metadata} for d in docs]
+        return docs
+
+    def _to_hits(self, docs: List[Any]) -> List[RAGHit]:
+        return [{"content": d.page_content, "metadata": d.metadata} for d in docs]
+
+    def _to_context(self, docs: List[Any]) -> List[Tuple[str, dict]]:
+        return [(d.page_content, d.metadata) for d in docs]
+
+    def execute(self, question: str, *, generate: bool = False, k: int | None = None, search_type: str | None = None) -> RAGResult:
+        # Permite overrides por requisição
+        if k is not None:
+            self.settings.retriever_k = k
+        if search_type:
+            self.settings.retriever_search_type = search_type
+
+        docs = self._retrieve(question)
+        hits = self._to_hits(docs)
+
         answer: str | None = None
         if generate:
-            chain = self._build_generate_chain(retriever)
-            answer = chain.invoke(question)
+            answer = self.llm.generate(question, context_snippets=self._to_context(docs))
+
         return {"answer": answer, "hits": hits}
