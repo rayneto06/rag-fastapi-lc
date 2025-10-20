@@ -111,7 +111,7 @@ pytest -q tests/test_rag_retrieval.py
 
 ---
 
-## 🧭 Roadmap sugerido (pequenos & testáveis)
+## 🧭 Roadmap
 1. **LLMProvider real (Ollama/OpenAI)** com adapter LCEL e teste de integração skipável.
 2. **Citações** nos resultados (ID/URI do chunk) e ordenação por score.
 3. **Streaming** da geração via Server-Sent Events (SSE).
