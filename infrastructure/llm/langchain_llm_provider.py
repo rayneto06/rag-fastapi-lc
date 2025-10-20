@@ -49,15 +49,27 @@ class LangChainLLMProvider(LLMProvider):
             return FakeListChatModel(responses=["This is a fake LLM answer."])
 
     def generate(self, question: str, context_snippets: List[Tuple[str, dict]] | None = None) -> str:
-        context_text = ""
+        ctx_texts = []
+        pages = []
         if context_snippets:
-            joined = "\n\n".join([text[:500] for text, _meta in context_snippets[:3]])
-            context_text = f"Use ONLY the following context:\n{joined}\n\n"
+            for text, meta in context_snippets[:10]:
+                ctx_texts.append(text)
+                p = meta.get("page")
+                if p is not None:
+                    pages.append(p)
 
+        context_text = "CONTEXT (use apenas o que segue):\n" + "\n\n---\n\n".join(t[:1200] for t in ctx_texts)
+        available = f"PÁGINAS DISPONÍVEIS NOS TRECHOS: {sorted(set(pages))}" if pages else "PÁGINAS DISPONÍVEIS: (não informadas)"
+
+        system = (
+            "Você é um assistente conciso e fiel ao contexto.\n"
+            "Para pedidos de RESUMO: produza um resumo apenas com o que estiver no contexto.\n"
+            "Se faltar informação relevante, ainda assim entregue o melhor resumo possível e liste 'Limitações' no final."
+        )
         messages = [
-            SystemMessage(content="You are a concise assistant. If the context is insufficient, say you cannot answer."),
-            HumanMessage(content=f"{context_text}Question: {question}"),
+            SystemMessage(content=system),
+            HumanMessage(content=f"{available}\n\n{context_text}\n\nPERGUNTA: {question}")
         ]
         out = self._llm.invoke(messages)
-        # Chat models retornam BaseMessage; pegar .content
         return getattr(out, "content", str(out))
+

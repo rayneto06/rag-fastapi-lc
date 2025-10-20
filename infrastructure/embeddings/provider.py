@@ -1,37 +1,39 @@
 from __future__ import annotations
-from typing import Any
-from app.settings import Settings
+
 from langchain_community.embeddings import FakeEmbeddings
+from langchain_openai import OpenAIEmbeddings
+from app.settings import Settings
 
 try:
-    from langchain_community.embeddings import OllamaEmbeddings  # optional
-except Exception:  # pragma: no cover
-    OllamaEmbeddings = None  # type: ignore
+    # Nova importação recomendada (LangChain ≥ 0.3.1)
+    from langchain_ollama import OllamaEmbeddings
+except Exception:  # fallback para compatibilidade antiga
+    from langchain_community.embeddings import OllamaEmbeddings
 
-try:
-    from langchain_openai import OpenAIEmbeddings  # optional
-except Exception:  # pragma: no cover
-    OpenAIEmbeddings = None  # type: ignore
 
 class EmbeddingsProvider:
+    """Provider centralizado de embeddings, com cache e fallback."""
+
+    _instance = None
+
     def __init__(self, settings: Settings | None = None):
         self.settings = settings or Settings()
-        self._instance: Any = None
 
     @property
     def instance(self):
-        if self._instance is not None:
-            return self._instance
-        provider = (self.settings.embeddings_provider or "fake").lower()
-        model = self.settings.embeddings_model
-        if provider == "ollama":
-            if OllamaEmbeddings is None:
-                raise RuntimeError("OllamaEmbeddings indisponível.")
-            self._instance = OllamaEmbeddings(model=model or "nomic-embed-text")
-        elif provider == "openai":
-            if OpenAIEmbeddings is None:
-                raise RuntimeError("OpenAIEmbeddings indisponível.")
-            self._instance = OpenAIEmbeddings(model=model or "text-embedding-3-large")
-        else:
-            self._instance = FakeEmbeddings(size=1536)
+        if self._instance is None:
+            self._instance = self._build()
         return self._instance
+
+    def _build(self):
+        provider = (self.settings.embeddings_provider or "fake").lower()
+        model = self.settings.embeddings_model or "fake"
+
+        if provider == "openai":
+            return OpenAIEmbeddings(model=model)
+        elif provider == "ollama":
+            # Usa o novo pacote oficial (langchain_ollama)
+            return OllamaEmbeddings(model=model or "nomic-embed-text")
+        else:
+            # Fallback determinístico para testes
+            return FakeEmbeddings(size=1536)

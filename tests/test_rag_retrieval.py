@@ -2,9 +2,12 @@ import pytest
 from pathlib import Path
 import fitz  # PyMuPDF
 from httpx import AsyncClient, ASGITransport
+
 from app.main import create_app
+from app.settings import Settings
 
 TEXT = "LangChain & Chroma make RAG nice"
+
 
 @pytest.mark.asyncio
 async def test_rag_retrieval_flow(tmp_path: Path):
@@ -30,9 +33,17 @@ async def test_rag_retrieval_flow(tmp_path: Path):
         data2 = resp2.json()
         assert len(data2["hits"]) >= 1
 
-        # 3) generate=True usa o LLMProvider (FakeListChatModel)
+        # 3) generate=True -> usa LLMProvider (fake ou real)
         resp3 = await ac.post("/v1/rag/query", json={"question": "Summarize", "generate": True})
         assert resp3.status_code == 200, resp3.text
         data3 = resp3.json()
         assert isinstance(data3.get("answer"), str)
-        assert "fake llm answer" in data3["answer"].lower()
+
+        provider = (Settings().llm_provider or "fake").lower()
+        ans = data3["answer"].lower()
+
+        if provider == "fake":
+            assert "fake llm answer" in ans
+        else:
+            assert ans.strip()
+            assert "fake llm answer" not in ans
