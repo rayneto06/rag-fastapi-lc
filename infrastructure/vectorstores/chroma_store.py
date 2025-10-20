@@ -26,3 +26,15 @@ class ChromaVectorStore:
 
     def as_retriever(self, search_type: str = "mmr", k: int = 5):
         return self._ensure_vs().as_retriever(search_type=search_type, search_kwargs={"k": k})
+    
+    def stats(self) -> dict:
+        """Estatísticas básicas da coleção persistida."""
+        vs = self._ensure_vs()
+        # Aviso: _collection é interno; como é rota de admin, ok para debug
+        col = getattr(vs, "_collection", None)
+        total = int(col.count()) if col is not None else 0
+        return {
+            "collection": self.collection_name,
+            "persist_directory": self.persist_dir,
+            "total_vectors": total,
+        }

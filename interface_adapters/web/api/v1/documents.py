@@ -5,6 +5,8 @@ from fastapi import APIRouter, UploadFile, File, status, HTTPException
 from pydantic import BaseModel
 from app.settings import Settings
 from use_cases.ingest_documents import IngestDocumentsUseCase
+from infrastructure.vectorstores.chroma_store import ChromaVectorStore
+
 
 router = APIRouter(tags=["documents"])
 
@@ -14,6 +16,11 @@ class DocumentIngestResponse(BaseModel):
     num_docs: int
     num_chunks: int
     collection: str
+
+class DocumentStatsResponse(BaseModel):
+    collection: str
+    persist_directory: str
+    total_vectors: int
 
 @router.post("/documents", response_model=DocumentIngestResponse, status_code=status.HTTP_201_CREATED)
 async def upload_document(file: UploadFile = File(...)) -> DocumentIngestResponse:
@@ -37,3 +44,13 @@ async def upload_document(file: UploadFile = File(...)) -> DocumentIngestRespons
         num_chunks=num_chunks,
         collection=settings.chroma_collection,
     )
+
+@router.get("/documents", response_model=DocumentStatsResponse)
+async def get_documents_stats() -> DocumentStatsResponse:
+    settings = Settings()
+    store = ChromaVectorStore(
+        persist_dir=settings.chroma_dir,
+        collection_name=settings.chroma_collection,
+    )
+    data = store.stats()
+    return DocumentStatsResponse(**data)
