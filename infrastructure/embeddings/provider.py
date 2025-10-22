@@ -1,15 +1,10 @@
 from __future__ import annotations
 
 from langchain_community.embeddings import FakeEmbeddings
+from langchain_ollama.embeddings import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 
 from app.settings import Settings
-
-try:
-    # Nova importação recomendada (LangChain ≥ 0.3.1)
-    from langchain_ollama import OllamaEmbeddings
-except Exception:  # fallback para compatibilidade antiga
-    from langchain_community.embeddings import OllamaEmbeddings
 
 
 class EmbeddingsProvider:
