@@ -30,7 +30,6 @@ dev = [
     "pytest>=8.2.0",
     "pytest-asyncio>=0.23.8",
     "ruff>=0.5.0",
-    "black>=24.4.2",
     "mypy>=1.10.0",
     "types-requests",
 ]
@@ -51,10 +50,6 @@ fix = true
 
 [tool.ruff.lint]
 extend-select = ["B", "C4", "I", "UP", "SIM"]
-
-[tool.black]
-line-length = 100
-target-version = ["py312"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
