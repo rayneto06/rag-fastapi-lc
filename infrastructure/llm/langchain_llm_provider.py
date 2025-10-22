@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import List, Tuple
+from langchain_core.language_models.fake_chat_models import FakeListChatModel
+from langchain_core.messages import HumanMessage, SystemMessage
+
 from app.settings import Settings
 from domain.services.llm_provider import LLMProvider
-
-from langchain_core.messages import SystemMessage, HumanMessage
-from langchain_core.language_models.fake_chat_models import FakeListChatModel
 
 try:
     from langchain_openai import ChatOpenAI  # type: ignore
@@ -48,7 +47,9 @@ class LangChainLLMProvider(LLMProvider):
             # Fake determinístico para testes unitários
             return FakeListChatModel(responses=["This is a fake LLM answer."])
 
-    def generate(self, question: str, context_snippets: List[Tuple[str, dict]] | None = None) -> str:
+    def generate(
+        self, question: str, context_snippets: list[tuple[str, dict]] | None = None
+    ) -> str:
         ctx_texts = []
         pages = []
         if context_snippets:
@@ -58,8 +59,14 @@ class LangChainLLMProvider(LLMProvider):
                 if p is not None:
                     pages.append(p)
 
-        context_text = "CONTEXT (use apenas o que segue):\n" + "\n\n---\n\n".join(t[:1200] for t in ctx_texts)
-        available = f"PÁGINAS DISPONÍVEIS NOS TRECHOS: {sorted(set(pages))}" if pages else "PÁGINAS DISPONÍVEIS: (não informadas)"
+        context_text = "CONTEXT (use apenas o que segue):\n" + "\n\n---\n\n".join(
+            t[:1200] for t in ctx_texts
+        )
+        available = (
+            f"PÁGINAS DISPONÍVEIS NOS TRECHOS: {sorted(set(pages))}"
+            if pages
+            else "PÁGINAS DISPONÍVEIS: (não informadas)"
+        )
 
         system = (
             "Você é um assistente conciso e fiel ao contexto.\n"
@@ -68,8 +75,7 @@ class LangChainLLMProvider(LLMProvider):
         )
         messages = [
             SystemMessage(content=system),
-            HumanMessage(content=f"{available}\n\n{context_text}\n\nPERGUNTA: {question}")
+            HumanMessage(content=f"{available}\n\n{context_text}\n\nPERGUNTA: {question}"),
         ]
         out = self._llm.invoke(messages)
         return getattr(out, "content", str(out))
-

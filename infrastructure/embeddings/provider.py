@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from langchain_community.embeddings import FakeEmbeddings
 from langchain_openai import OpenAIEmbeddings
+
 from app.settings import Settings
 
 try:

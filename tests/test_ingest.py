@@ -1,8 +1,11 @@
-import pytest
-import fitz  # PyMuPDF
-from httpx import AsyncClient, ASGITransport
 from pathlib import Path
+
+import fitz  # PyMuPDF
+import pytest
+from httpx import ASGITransport, AsyncClient
+
 from app.main import create_app
+
 
 @pytest.mark.asyncio
 async def test_ingest_pdf_ok(tmp_path: Path):

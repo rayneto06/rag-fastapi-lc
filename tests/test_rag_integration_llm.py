@@ -3,10 +3,9 @@ from pathlib import Path
 
 import fitz  # PyMuPDF
 import pytest
-from httpx import AsyncClient, ASGITransport
+from httpx import ASGITransport, AsyncClient
 
 from app.main import create_app
-
 
 pytestmark = pytest.mark.integration  # marca o módulo todo como "integration"
 
@@ -33,8 +32,7 @@ async def test_rag_integration_real_llm(tmp_path: Path):
     doc = fitz.open()
     page = doc.new_page()
     page.insert_text(
-        (72, 72),
-        "Este é um documento de teste para o fluxo de integração com LLM real."
+        (72, 72), "Este é um documento de teste para o fluxo de integração com LLM real."
     )
     doc.save(pdf_path)
     doc.close()

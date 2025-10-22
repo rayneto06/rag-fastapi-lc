@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from langchain_chroma import Chroma
+
 from infrastructure.embeddings.provider import EmbeddingsProvider
+
 
 class ChromaVectorStore:
     def __init__(self, persist_dir: str, collection_name: str = "documents") -> None:
@@ -26,7 +28,7 @@ class ChromaVectorStore:
 
     def as_retriever(self, search_type: str = "mmr", k: int = 5):
         return self._ensure_vs().as_retriever(search_type=search_type, search_kwargs={"k": k})
-    
+
     def stats(self) -> dict:
         """Estatísticas básicas da coleção persistida."""
         vs = self._ensure_vs()

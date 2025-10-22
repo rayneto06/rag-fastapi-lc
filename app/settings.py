@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     # Observability (LangSmith)
     langchain_tracing_v2: bool = False
@@ -15,18 +16,19 @@ class Settings(BaseSettings):
 
     # Embeddings
     embeddings_provider: str = "fake"  # fake | ollama | openai
-    embeddings_model: str = "fake"     # e.g., nomic-embed-text (Ollama)
+    embeddings_model: str = "fake"  # e.g., nomic-embed-text (Ollama)
 
     # Query defaults
     retriever_search_type: str = "mmr"
     retriever_k: int = 5
 
     # LLM Provider (Step 4)
-    llm_provider: str = "fake"       # fake | openai | ollama
-    llm_model: str = "fake"          # e.g., gpt-4o-mini | llama3.1
-    llm_temperature: float = 0.0     # determinístico por padrão
+    llm_provider: str = "fake"  # fake | openai | ollama
+    llm_model: str = "fake"  # e.g., gpt-4o-mini | llama3.1
+    llm_temperature: float = 0.0  # determinístico por padrão
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="", extra="ignore")
+
 
 class AppState(BaseModel):
     settings: Settings

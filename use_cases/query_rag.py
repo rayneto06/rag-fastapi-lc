@@ -1,16 +1,21 @@
 from __future__ import annotations
-from typing import TypedDict, List, Dict, Any, Tuple
-from infrastructure.vectorstores.chroma_store import ChromaVectorStore
-from infrastructure.llm.langchain_llm_provider import LangChainLLMProvider
+
+from typing import Any, TypedDict
+
 from app.settings import Settings
+from infrastructure.llm.langchain_llm_provider import LangChainLLMProvider
+from infrastructure.vectorstores.chroma_store import ChromaVectorStore
+
 
 class RAGHit(TypedDict):
     content: str
-    metadata: Dict[str, Any]
+    metadata: dict[str, Any]
+
 
 class RAGResult(TypedDict):
     answer: str | None
-    hits: List[RAGHit]
+    hits: list[RAGHit]
+
 
 class QueryRAGUseCase:
     def __init__(self, settings: Settings | None = None) -> None:
@@ -21,7 +26,7 @@ class QueryRAGUseCase:
         )
         self.llm = LangChainLLMProvider(self.settings)
 
-    def _retrieve(self, question: str) -> List[Any]:
+    def _retrieve(self, question: str) -> list[Any]:
         retriever = self.store.as_retriever(
             search_type=self.settings.retriever_search_type,
             k=self.settings.retriever_k,
@@ -29,13 +34,20 @@ class QueryRAGUseCase:
         docs = retriever.invoke(question)
         return docs
 
-    def _to_hits(self, docs: List[Any]) -> List[RAGHit]:
+    def _to_hits(self, docs: list[Any]) -> list[RAGHit]:
         return [{"content": d.page_content, "metadata": d.metadata} for d in docs]
 
-    def _to_context(self, docs: List[Any]) -> List[Tuple[str, dict]]:
+    def _to_context(self, docs: list[Any]) -> list[tuple[str, dict]]:
         return [(d.page_content, d.metadata) for d in docs]
 
-    def execute(self, question: str, *, generate: bool = False, k: int | None = None, search_type: str | None = None) -> RAGResult:
+    def execute(
+        self,
+        question: str,
+        *,
+        generate: bool = False,
+        k: int | None = None,
+        search_type: str | None = None,
+    ) -> RAGResult:
         # Permite overrides por requisição
         if k is not None:
             self.settings.retriever_k = k

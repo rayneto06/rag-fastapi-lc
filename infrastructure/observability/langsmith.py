@@ -1,5 +1,7 @@
 import os
+
 from app.settings import Settings
+
 
 def enable_langsmith(settings: Settings) -> None:
     """Configura variáveis de ambiente para LangSmith, se habilitado."""

@@ -1,14 +1,18 @@
 from __future__ import annotations
-from datetime import datetime, UTC
-from pathlib import Path
-from fastapi import APIRouter, UploadFile, File, status, HTTPException
-from pydantic import BaseModel
-from app.settings import Settings
-from use_cases.ingest_documents import IngestDocumentsUseCase
-from infrastructure.vectorstores.chroma_store import ChromaVectorStore
 
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Annotated
+
+from fastapi import APIRouter, File, HTTPException, UploadFile, status
+from pydantic import BaseModel
+
+from app.settings import Settings
+from infrastructure.vectorstores.chroma_store import ChromaVectorStore
+from use_cases.ingest_documents import IngestDocumentsUseCase
 
 router = APIRouter(tags=["documents"])
+
 
 class DocumentIngestResponse(BaseModel):
     filename: str
@@ -17,13 +21,17 @@ class DocumentIngestResponse(BaseModel):
     num_chunks: int
     collection: str
 
+
 class DocumentStatsResponse(BaseModel):
     collection: str
     persist_directory: str
     total_vectors: int
 
-@router.post("/documents", response_model=DocumentIngestResponse, status_code=status.HTTP_201_CREATED)
-async def upload_document(file: UploadFile = File(...)) -> DocumentIngestResponse:
+
+@router.post(
+    "/documents", response_model=DocumentIngestResponse, status_code=status.HTTP_201_CREATED
+)
+async def upload_document(file: Annotated[UploadFile, File(...)]) -> DocumentIngestResponse:
     settings = Settings()
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Apenas PDFs são aceitos.")
@@ -44,6 +52,7 @@ async def upload_document(file: UploadFile = File(...)) -> DocumentIngestRespons
         num_chunks=num_chunks,
         collection=settings.chroma_collection,
     )
+
 
 @router.get("/documents", response_model=DocumentStatsResponse)
 async def get_documents_stats() -> DocumentStatsResponse:

@@ -1,5 +1,6 @@
-from app.settings import Settings, AppState
+from app.settings import AppState, Settings
 from infrastructure.observability.langsmith import enable_langsmith
+
 
 def build_app_state() -> AppState:
     settings = Settings()

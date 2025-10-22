@@ -1,11 +1,15 @@
 from typing import TypedDict
+
 from infrastructure.llm.langchain_provider import build_echo_chain
+
 
 class EchoInput(TypedDict):
     question: str
 
+
 class EchoOutput(TypedDict):
     answer: str
+
 
 class QuerySimpleUseCase:
     def __init__(self) -> None:

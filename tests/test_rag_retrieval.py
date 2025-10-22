@@ -1,7 +1,8 @@
-import pytest
 from pathlib import Path
+
 import fitz  # PyMuPDF
-from httpx import AsyncClient, ASGITransport
+import pytest
+from httpx import ASGITransport, AsyncClient
 
 from app.main import create_app
 from app.settings import Settings
@@ -28,7 +29,9 @@ async def test_rag_retrieval_flow(tmp_path: Path):
             assert resp.status_code == 201, resp.text
 
         # 2) retrieval-only
-        resp2 = await ac.post("/v1/rag/query", json={"question": "What makes RAG nice?", "generate": False, "k": 3})
+        resp2 = await ac.post(
+            "/v1/rag/query", json={"question": "What makes RAG nice?", "generate": False, "k": 3}
+        )
         assert resp2.status_code == 200, resp2.text
         data2 = resp2.json()
         assert len(data2["hits"]) >= 1
