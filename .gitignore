@@ -56,19 +56,32 @@ ruff_cache/
 .env.*
 !.env.example
 
-# === LangChain / Chroma ===
+# === LangChain / Chroma / HuggingFace ===
 .chroma/
+.chroma_eval/
 chromadb/
 chroma_index/
 .vectorstore/
 langchain.db
 *.sqlite3
+.hf_cache/
+.huggingface/
+cache_dir/
+models/
 
-# === Reports / Docs ===
+# === Evaluation Outputs ===
+data/eval/reports/
+data/eval/*.csv
+!data/eval/eval_gold.csv     # keep the gold set under version control
+
+# === PDF / Reports / Docs ===
 htmlcov/
 site/
 docs/_build/
 *.pdf
+*.md~
+*.docx
+*.odt
 
 # === Containers / Docker ===
 *.pid
@@ -90,3 +103,6 @@ docker-compose.override.yml
 .ipynb_checkpoints/
 *.ipynb
 *.nbconvert.ipynb
+
+# === VS Code Workspace Backups ===
+.history/
